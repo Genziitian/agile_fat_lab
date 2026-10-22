@@ -1,8 +1,9 @@
 pipeline {
     agent any
     
+    // Corrected Parameterized Choice Build Syntax
     parameters {
-        choice(name: 'DEPLOY_ENV', defaultValue: 'Staging', choices: ['Staging', 'Production'], description: 'Select target deployment workspace environment.')
+        choice(name: 'DEPLOY_ENV', choices: ['Staging', 'Production'], description: 'Select target deployment workspace environment.')
         booleanParam(name: 'RUN_DIAGNOSTICS', defaultValue: true, description: 'Toggle comprehensive environment automated checking loops.')
     }
     
@@ -14,7 +15,6 @@ pipeline {
             }
         }
         
-
         stage('Parallel Automated Verifications') {
             parallel {
                 stage('Code Lint Verification') {
@@ -32,7 +32,6 @@ pipeline {
             }
         }
 
-       
         stage('Comprehensive System Diagnostic Loop') {
             when {
                 expression { params.RUN_DIAGNOSTICS == true }
@@ -45,12 +44,10 @@ pipeline {
         stage('Compile and Package Workspace Assets') {
             steps {
                 echo "Packaging current production assets build..."
-               
                 sh "echo 'Build Version: ${BUILD_NUMBER}' > build-manifest.txt"
             }
         }
 
-    
         stage('Publish Workspace Archive Assets') {
             steps {
                 echo "Archiving operational files safely to Jenkins master controller node storage..."
