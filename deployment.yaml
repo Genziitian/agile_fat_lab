@@ -1,41 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: predictive-maintenance-app
+  name: industrial-dashboard-deployment
   labels:
-    app: predictive-maintenance
+    app: predictive-industrial-hub
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: predictive-maintenance
+      app: predictive-industrial-hub
   template:
     metadata:
       labels:
-        app: predictive-maintenance
+        app: predictive-industrial-hub
     spec:
       containers:
       - name: web-dashboard
-        image: DOCKERHUB_USERNAME/predictive-maintenance:v1
-        imagePullPolicy: Always
+        image: sriram1108/industrial-app:latest
         ports:
         - containerPort: 80
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        imagePullPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: predictive-maintenance-service
+  name: industrial-dashboard-service
 spec:
   type: NodePort
   selector:
-    app: predictive-maintenance
+    app: predictive-industrial-hub
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 32049
+      nodePort: 32066
