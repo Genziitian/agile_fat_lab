@@ -4,7 +4,6 @@ pipeline {
     environment {
         DOCKER_USER = 'sriram1108'
         IMAGE_NAME  = 'industrial-app'
-        REG_CREDS   = 'docker-hub-credentials'
     }
     
     parameters {
@@ -44,8 +43,9 @@ pipeline {
                     bat "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:latest ."
                     bat "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER} ."
                     
-                    withCredentials([usernamePassword(credentialsId: "${REG_CREDS}", usernameVariable: 'DOCKER_REG_USER', passwordVariable: 'DOCKER_REG_PASS')]) {
-                        bat "docker login -u %DOCKER_REG_USER% -p %DOCKER_REG_PASS%"
+                    // Robust credential binding syntax for Windows environments
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        bat 'docker login -u "%USER%" -p "%PASS%"'
                         bat "docker push ${DOCKER_USER}/${IMAGE_NAME}:latest"
                         bat "docker push ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
                     }
