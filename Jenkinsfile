@@ -4,6 +4,8 @@ pipeline {
     environment {
         DOCKER_USER = 'sriram1108'
         IMAGE_NAME  = 'industrial-app'
+        // Directs the Jenkins system service to your local user's Kubernetes configuration
+        KUBECONFIG  = 'C:\\Users\\batch1\\.kube\\config'
     }
     
     parameters {
@@ -43,9 +45,8 @@ pipeline {
                     bat "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:latest ."
                     bat "docker build -t ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER} ."
                     
-                    // Robust credential binding syntax for Windows environments
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                        bat 'docker login -u "%USER%" -p "%PASS%"'
+                        bat "docker login -u %USER% -p %PASS%"
                         bat "docker push ${DOCKER_USER}/${IMAGE_NAME}:latest"
                         bat "docker push ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
                     }
@@ -55,11 +56,12 @@ pipeline {
 
         stage('Orchestrate Cluster Deployment') {
             steps {
-                echo "Applying Kubernetes manifests to local cluster environment..."
-                bat "kubectl apply -f deployment.yaml"
+                echo "Applying Kubernetes manifests using designated KUBECONFIG mapping path..."
+                // Runs kubectl using your explicit profile configuration parameters
+                bat "kubectl --kubeconfig=\"%KUBECONFIG%\" apply -f deployment.yaml"
                 
                 echo "Verifying active tracking rollout status parameters..."
-                bat "kubectl rollout status deployment/industrial-dashboard-deployment --timeout=90s"
+                bat "kubectl --kubeconfig=\"%KUBECONFIG%\" rollout status deployment/industrial-dashboard-deployment --timeout=90s"
             }
         }
 
