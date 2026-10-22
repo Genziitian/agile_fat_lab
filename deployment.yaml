@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: predictive-maintenance-app
+  labels:
+    app: predictive-maintenance
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: predictive-maintenance
+  template:
+    metadata:
+      labels:
+        app: predictive-maintenance
+    spec:
+      containers:
+      - name: web-dashboard
+        image: DOCKERHUB_USERNAME/predictive-maintenance:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: predictive-maintenance-service
+spec:
+  type: NodePort
+  selector:
+    app: predictive-maintenance
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 32049
