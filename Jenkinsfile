@@ -1,7 +1,6 @@
 pipeline {
     agent any
     
-    // Corrected Parameterized Choice Build Syntax
     parameters {
         choice(name: 'DEPLOY_ENV', choices: ['Staging', 'Production'], description: 'Select target deployment workspace environment.')
         booleanParam(name: 'RUN_DIAGNOSTICS', defaultValue: true, description: 'Toggle comprehensive environment automated checking loops.')
@@ -20,13 +19,15 @@ pipeline {
                 stage('Code Lint Verification') {
                     steps {
                         echo "Analyzing dashboard index.html style schema structure..."
-                        sh "ls -la"
+                        
+                        bat "dir"
                     }
                 }
                 stage('Mock Diagnostic Testing Engine') {
                     steps {
                         echo "Executing simulated machinery telemetry validations..."
-                        sh "echo 'Testing threshold parameters... Passed'"
+                       
+                        bat "echo Testing threshold parameters... Passed"
                     }
                 }
             }
@@ -44,7 +45,8 @@ pipeline {
         stage('Compile and Package Workspace Assets') {
             steps {
                 echo "Packaging current production assets build..."
-                sh "echo 'Build Version: ${BUILD_NUMBER}' > build-manifest.txt"
+               
+                bat "echo Build Version: %BUILD_NUMBER% > build-manifest.txt"
             }
         }
 
